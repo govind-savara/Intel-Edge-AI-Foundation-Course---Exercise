@@ -8,10 +8,10 @@ def handle_pose(output, input_shape):
     Returns ONLY the keypoint heatmaps, and not the Part Affinity Fields.
     '''
     # TODO 1: Extract only the second blob output (keypoint heatmaps)
-    heatmaps = output['Mconv7_stage2_L2']
+    heatmaps = None
     # TODO 2: Resize the heatmap back to the size of the input
     # Create an empty array to handle the output map
-    out_heatmap = np.zeros([heatmaps.shape[1], input_shape[0], input_shape[1]])
+    out_heatmap = None
     
     # Iterage through and re-size each heatmap
     for h in range(len(heatmaps[0])):
@@ -27,12 +27,10 @@ def handle_text(output, input_shape):
         and not the linkage between pixels and their neighbors.
     '''
     # TODO 1: Extract only the first blob output (text/no text classification)
-    text_classes = output['model/segm_logits/add']
+    text_classes = None
     
     # TODO 2: Resize this output back to the size of the input
-    out_text = np.empty([text_classes.shape[1], input_shape[0], input_shape[1]])
-    for t in range(len(text_classes[0])):
-        out_text[t] = cv2.resize(text_classes[0][t], input_shape[0:2][::-1])
+    out_text = None
 
     return out_text
 
@@ -47,9 +45,9 @@ def handle_car(output, input_shape):
     color = output['color'].flatten()
     car_type = output['type'].flatten()
     # TODO 1: Get the argmax of the "color" output
-    color_pred = np.argmax(color)
+    color_pred = None
     # TODO 2: Get the argmax of the "type" output
-    type_pred = np.argmax(car_type)
+    type_pred = None
 
     return color_pred, type_pred
 

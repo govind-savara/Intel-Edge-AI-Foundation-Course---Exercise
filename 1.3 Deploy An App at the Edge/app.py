@@ -109,7 +109,7 @@ def perform_inference(args):
     image = cv2.imread(args.i)
 
     ### TODO: Preprocess the input image
-    preprocessed_image = preprocessing(image, h, w)
+    preprocessed_image = None
 
     # Perform synchronous inference on the image
     inference_network.sync_inference(preprocessed_image)
@@ -120,11 +120,10 @@ def perform_inference(args):
     ### TODO: Handle the output of the network, based on args.t
     ### Note: This will require using `handle_output` to get the correct
     ###       function, and then feeding the output to that function.
-    output_func = handle_output(args.t)
-    processed_output = output_func(output, image.shape)
+    
 
     # Create an output image based on network
-    output_image = create_output_image(args.t, image, processed_output)
+    output_image = None
 
     # Save down the resulting image
     cv2.imwrite("outputs/{}-output.png".format(args.t), output_image)
