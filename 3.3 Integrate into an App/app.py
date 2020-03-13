@@ -17,7 +17,8 @@ def get_args():
     ### TODO: Add additional arguments and descriptions for:
     ###       1) Different confidence thresholds used to draw bounding boxes
     ###       2) The user choosing the color of the bounding boxes
-    
+    c_desc = "The color of the bounding boxes tto drwa; RED, GREEN or BLUE"
+    ct_desc = "The confidence threshold to use with the bounding boxes"
 
     # -- Add required and optional groups
     parser._action_groups.pop()
@@ -28,18 +29,23 @@ def get_args():
     required.add_argument("-m", help=m_desc, required=True)
     optional.add_argument("-i", help=i_desc, default=INPUT_STREAM)
     optional.add_argument("-d", help=d_desc, default='CPU')
-    
+    optional.add_argument("-c", help=c_desc, default='BLUE')
+    optional.add_argument("-ct", help=ct_desc, default=0.5)
     args = parser.parse_args()
     
+    args.c = convert_color(args.c)
+    args.ct = float(args.ct)
+
     return args
 
 
 def infer_on_video(args):
     ### TODO: Initialize the Inference Engine
-    
-    
+    plugin = Network()
+
     ### TODO: Load the network model into the IE
-    
+    plugin.load_model(args.m, args.d, CPU_EXTENSION)
+    net_input_shape = plugin.get_input_shape()
 
     # Get and open video capture
     cap = cv2.VideoCapture(args.i)
@@ -63,19 +69,22 @@ def infer_on_video(args):
         key_pressed = cv2.waitKey(60)
 
         ### TODO: Pre-process the frame
-        
+        p_frame = cv2.resize(frame, (net_input_shape[3], net_input_shape[2]))
+        p_frame = p_frame.transpose((2,0,1))
+        p_frame = p_frame.reshape(1, *p_frame.shape)
 
         ### TODO: Perform inference on the frame
-        
+        plugin.async_inference(p_frame)
 
         ### TODO: Get the output of inference
-        
+        if plugin.wait() == 0:
+            result = plugin.extract_output()
             
-        ### TODO: Update the frame to include detected bounding boxes
-        
+            ### TODO: Update the frame to include detected bounding boxes
+            frame = draw_boxes(frame, result, args, width, height)
             
-        # Write out the frame
-        out.write(frame)
+            # Write out the frame
+            out.write(frame)
      
         # Break if escape key pressed
         if key_pressed == 27:
