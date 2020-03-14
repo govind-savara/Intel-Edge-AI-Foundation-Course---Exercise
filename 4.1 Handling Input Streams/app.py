@@ -20,31 +20,57 @@ def get_args():
 def capture_stream(args):
     ### TODO: Handle image, video or webcam
     # create a flag for single image
-    
+    image_flag = False
     
     # Check if the input is a webcam
-    
+    if args.i == 'CAM':
+        args.i = 0
+    elif args.i.endswith('.jpg') or args.i.endswith('.bmp'):
+        image_flag = True
 
     ### TODO: Get and open video capture
-    
+    capture = cv2.VideoCapture(args.i)
+    capture.open(args.i)
     
     # Create a video write for the output video
-    
+    if not image_flag:
+        out = cv2.VideoWriter('out.mp4', 0x00000021, 30, (100, 100))
+    else:
+        out = None
         
     # Process frames until the video ends, or process is exited
-    # Read the next frame
+    while capture.isOpened():
+        # Read the next frame
+        flag, frame = capture.read()
+        if not flag:
+            break
         
-    ### TODO: Re-size the frame to 100x100
+        key_pressed = cv2.waitKey(60)
 
-    ### TODO: Add Canny Edge Detection to the frame, 
-    ###       with min & max values of 100 and 200
-    ###       Make sure to use np.dstack after to make a 3-channel image
-    
+        ### TODO: Re-size the frame to 100x100
+        frame = cv2.resize(frame, (100,100))
 
-    ### TODO: Write out the frame, depending on image or video
-    
+        ### TODO: Add Canny Edge Detection to the frame, 
+        ###       with min & max values of 100 and 200
+        ###       Make sure to use np.dstack after to make a 3-channel image
+        frame = cv2.Canny(frame, 100, 200)
+        frame = np.dstack((frame, frame, frame))
+
+        ### TODO: Write out the frame, depending on image or video
+        if image_flag:
+            cv2.imwrite('output_image.jpg', frame)
+        else:
+            out.write(frame)
+            
+        # Break if escape key pressed
+        if key_pressed == 27:
+            break
 
     ### TODO: Close the stream and any windows at the end of the application
+    if not image_flag:
+        out.release()
+    capture.release()
+    cv2.destroyAllWindows()
 
 
 def main():
