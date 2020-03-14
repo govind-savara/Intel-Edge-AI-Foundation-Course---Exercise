@@ -78,7 +78,7 @@ def infer_on_video(args):
         if plugin.wait() == 0:
             result = plugin.extract_output()
             ### TODO: Process the output
-            
+            incident_flag = assess_scene(result, counter, incident_flag)
             
 
         # Break if escape key pressed
